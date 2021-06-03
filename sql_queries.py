@@ -156,32 +156,35 @@ user_table_insert = ("""
     INSERT INTO sparkify_user (
         user_id, first_name, last_name, gender, level
     )
-    SELECT cast(userId as integer), firstName, lastName, gender, level
+    SELECT DISTINCT cast(userId as integer), firstName, lastName, gender, level
     FROM staging_event
-    WHERE page='NextSong';
+    WHERE page='NextSong'
+      AND userId NOT IN (SELECT DISTINCT user_id FROM sparkify_user);
 """)
 
 song_table_insert = ("""
     INSERT INTO song (
         song_id, title, artist_id, year, duration
     )
-    SELECT song_id, title, artist_id, year, duration
-    FROM staging_song;
+    SELECT DISTINCT song_id, title, artist_id, year, duration
+    FROM staging_song
+    WHERE song_id NOT IN (SELECT DISTINCT song_id FROM song);
 """)
 
 artist_table_insert = ("""
     INSERT INTO artist (
         artist_id, name, location, latitude, longitude
     )
-    SELECT artist_id, artist_name, artist_location, artist_latitude, artist_longitude
-    FROM staging_song;
+    SELECT DISTINCT artist_id, artist_name, artist_location, artist_latitude, artist_longitude
+    FROM staging_song
+    WHERE artist_id NOT IN (SELECT DISTINCT artist_id FROM song);
 """)
 
 time_table_insert = ("""
     INSERT INTO time (
         start_time, hour, day, week, month, year, weekday
     )
-    SELECT
+    SELECT DISTINCT
         start_time,
         EXTRACT(hour from start_time),
         EXTRACT(day from start_time),
@@ -189,7 +192,8 @@ time_table_insert = ("""
         EXTRACT(month from start_time),
         EXTRACT(year from start_time),
         EXTRACT(dow from start_time)
-    FROM songplay;
+    FROM songplay
+    WHERE start_time NOT IN (SELECT DISTINCT start_time FROM time);
 """)
 
 # QUERY LISTS
