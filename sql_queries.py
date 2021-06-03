@@ -85,7 +85,7 @@ song_table_create = ("""
     CREATE TABLE IF NOT EXISTS song (
         song_id varchar NOT NULL DISTKEY,
         title varchar NOT NULL,
-        artist_id varchar,
+        artist_id varchar NOT NULL,
         year integer NOT NULL,
         duration decimal NOT NULL,
         primary key (song_id)
