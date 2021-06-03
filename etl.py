@@ -6,7 +6,6 @@ from sql_queries import copy_table_queries, insert_table_queries
 
 def load_staging_tables(cur, conn, query_params):
     """Pulls data from S3 buckets and inserts the data into the staging tables."""
-    
     for query, params in list(zip(copy_table_queries, query_params)):
         cur.execute(query.format(*params))
         conn.commit()
@@ -47,7 +46,9 @@ def main():
         (config.get("S3", "LOG_DATA"), role_arn, config.get("S3", "LOG_JSONPATH")),
         (config.get("S3", "SONG_DATA"), role_arn)
     ]
+    print("--- Loading data into staging tables.")
     load_staging_tables(cur, conn, staging_query_params)
+    print("--- Inserting data into analysis tables.")
     insert_tables(cur, conn)
 
     conn.close()
